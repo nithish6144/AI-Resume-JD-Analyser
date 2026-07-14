@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Resume Match</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+    <main class="page-shell">
+
+        <section class="hero">
+
+            <div class="brand">
+                <div class="brand-mark">R</div>
+                <span>Resume Match</span>
+            </div>
+
+            <div class="hero-content">
+
+                <p class="eyebrow">
+                    AI-POWERED RESUME ANALYSIS
+                </p>
+
+                <h1>
+                    See how well your resume
+                    <span>matches the role.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Upload your resume and paste a job description.
+                    Get a focused compatibility analysis with matched
+                    skills, missing keywords and practical improvements.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <section class="workspace">
+
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+                class="matcher-form"
+            >
+
+                <div class="form-grid">
+
+                    <div class="field-group">
+
+                        <label for="resume">
+                            Resume
+                        </label>
+
+
+                        <!-- PDF UPLOAD BOX -->
+
+                        <div
+                            class="upload-box"
+                            id="uploadBox"
+                        >
+
+                            <input
+                                type="file"
+                                id="resume"
+                                name="resume"
+                                accept=".pdf,application/pdf"
+                                required
+                            >
+
+                            <div
+                                class="upload-icon"
+                                id="uploadIcon"
+                            >
+                                ↑
+                            </div>
+
+                            <h3 id="uploadTitle">
+                                Upload your resume
+                            </h3>
+
+                            <p id="uploadText">
+                                PDF only · Maximum 5 MB
+                            </p>
+
+                            <div
+                                class="selected-file"
+                                id="selectedFile"
+                            >
+                            </div>
+
+                        </div>
+
+                        <!-- END PDF UPLOAD BOX -->
+
+                    </div>
+
+
+                    <div class="field-group">
+
+                        <label for="job_description">
+                            Job Description
+                        </label>
+
+                        <textarea
+                            id="job_description"
+                            name="job_description"
+                            placeholder="Paste the full job description here..."
+                            required
+                        >{{ request.form.get('job_description', '') }}</textarea>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="analyse-button"
+                    id="analyseButton"
+                >
+
+                    <span id="buttonText">
+                        Analyse Match
+                    </span>
+
+                    <span>
+                        →
+                    </span>
+
+                </button>
+
+            </form>
+
+
+            {% if error %}
+
+            <div class="error-card">
+
+                <div class="error-icon">
+                    !
+                </div>
+
+                <div>
+
+                    <strong>
+                        Analysis failed
+                    </strong>
+
+                    <p>
+                        {{ error }}
+                    </p>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+
+            {% if result %}
+
+            <section class="results">
+
+                <div class="results-header">
+
+                    <div>
+
+                        <p class="eyebrow">
+                            MATCH ANALYSIS
+                        </p>
+
+                        <h2>
+                            Your compatibility report
+                        </h2>
+
+                    </div>
+
+
+                    <div class="score-card">
+
+                        <div class="score">
+
+                            {{ result.match_score }}
+
+                            <span>
+                                %
+                            </span>
+
+                        </div>
+
+                        <p>
+                            Match Score
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="skills-grid">
+
+                    <div class="skill-card matched">
+
+                        <div class="card-heading">
+
+                            <span class="status-icon">
+                                ✓
+                            </span>
+
+                            <h3>
+                                Matched Skills
+                            </h3>
+
+                        </div>
+
+
+                        <div class="skill-list">
+
+                            {% for skill in result.matched_skills %}
+
+                            <span class="skill-tag">
+                                {{ skill }}
+                            </span>
+
+                            {% else %}
+
+                            <p class="empty-state">
+                                No direct skill matches found.
+                            </p>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="skill-card missing">
+
+                        <div class="card-heading">
+
+                            <span class="status-icon">
+                                −
+                            </span>
+
+                            <h3>
+                                Missing Skills
+                            </h3>
+
+                        </div>
+
+
+                        <div class="skill-list">
+
+                            {% for skill in result.missing_skills %}
+
+                            <span class="skill-tag">
+                                {{ skill }}
+                            </span>
+
+                            {% else %}
+
+                            <p class="empty-state">
+                                No major missing skills identified.
+                            </p>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="suggestions-card">
+
+                    <div class="suggestions-heading">
+
+                        <p class="eyebrow">
+                            RECOMMENDATIONS
+                        </p>
+
+                        <h3>
+                            How to strengthen your resume
+                        </h3>
+
+                    </div>
+
+
+                    <div class="suggestion-list">
+
+                        {% for suggestion in result.suggestions %}
+
+                        <div class="suggestion">
+
+                            <span class="suggestion-number">
+                                0{{ loop.index }}
+                            </span>
+
+                            <p>
+                                {{ suggestion }}
+                            </p>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+                <div class="improve-cta">
+
+    <div>
+
+        <p class="eyebrow">
+            READY TO IMPROVE?
+        </p>
+
+        <h3>
+            Turn your analysis into
+            stronger resume content.
+        </h3>
+
+        <p class="improve-description">
+            Rewrite weak resume bullets and improve
+            ATS alignment without inventing experience.
+        </p>
+
+    </div>
+
+
+    <form
+        method="POST"
+        action="{{ url_for('improve') }}"
+    >
+
+        <button
+            type="submit"
+            class="improve-button"
+        >
+            Improve My Resume
+
+            <span>
+                →
+            </span>
+
+        </button>
+
+    </form>
+
+</div>
+
+{% if optimization %}
+
+<section class="optimization-results">
+
+    <div class="optimization-header">
+
+        <p class="eyebrow">
+            RESUME OPTIMIZATION
+        </p>
+
+        <h2>
+            Make your experience
+            work harder.
+        </h2>
+
+    </div>
+
+
+    <div class="bullet-improvements">
+
+        {% for bullet in optimization.improved_bullets %}
+
+        <div class="bullet-card">
+
+            <div class="bullet-number">
+                0{{ loop.index }}
+            </div>
+
+
+            <div class="bullet-content">
+
+                <div class="bullet-version original">
+
+                    <span>
+                        ORIGINAL
+                    </span>
+
+                    <p>
+                        {{ bullet.original }}
+                    </p>
+
+                </div>
+
+
+                <div class="rewrite-arrow">
+                    ↓
+                </div>
+
+
+                <div class="bullet-version improved">
+
+                    <span>
+                        IMPROVED
+                    </span>
+
+                    <p>
+                        {{ bullet.improved }}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <div class="keyword-card">
+
+        <p class="eyebrow">
+            KEYWORDS TO CONSIDER
+        </p>
+
+
+        <div class="keyword-list">
+
+            {% for keyword in optimization.keywords_to_consider %}
+
+            <span class="keyword-tag">
+                {{ keyword }}
+            </span>
+
+            {% else %}
+
+            <p class="empty-state">
+                No additional safe keywords identified.
+            </p>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+    <div class="strategy-card">
+
+        <p class="eyebrow">
+            FINAL STRATEGY
+        </p>
+
+        <p class="strategy-text">
+            {{ optimization.final_strategy }}
+        </p>
+
+    </div>
+
+</section>
+
+{% endif %}
+
+            </section>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        const resumeInput =
+            document.getElementById("resume");
+
+        const uploadBox =
+            document.getElementById("uploadBox");
+
+        const uploadIcon =
+            document.getElementById("uploadIcon");
+
+        const uploadTitle =
+            document.getElementById("uploadTitle");
+
+        const uploadText =
+            document.getElementById("uploadText");
+
+        const selectedFile =
+            document.getElementById("selectedFile");
+
+        const matcherForm =
+            document.querySelector(".matcher-form");
+
+        const analyseButton =
+            document.getElementById("analyseButton");
+
+        const buttonText =
+            document.getElementById("buttonText");
+
+
+        resumeInput.addEventListener(
+            "change",
+            function () {
+
+                const file = this.files[0];
+
+
+                if (!file) {
+
+                    resetUploadBox();
+
+                    return;
+
+                }
+
+
+                const isPDF =
+                    file.type === "application/pdf"
+                    ||
+                    file.name.toLowerCase().endsWith(".pdf");
+
+
+                if (!isPDF) {
+
+                    alert(
+                        "Please select a PDF file."
+                    );
+
+                    this.value = "";
+
+                    resetUploadBox();
+
+                    return;
+
+                }
+
+
+                const maxSize =
+                    5 * 1024 * 1024;
+
+
+                if (file.size > maxSize) {
+
+                    alert(
+                        "PDF must be less than 5 MB."
+                    );
+
+                    this.value = "";
+
+                    resetUploadBox();
+
+                    return;
+
+                }
+
+
+                uploadBox.classList.add(
+                    "file-selected"
+                );
+
+
+                uploadIcon.innerText = "✓";
+
+
+                uploadTitle.innerText =
+                    "Resume selected";
+
+
+                uploadText.innerText =
+                    "Ready for analysis";
+
+
+                selectedFile.innerText =
+                    file.name;
+
+            }
+        );
+
+
+        function resetUploadBox() {
+
+            uploadBox.classList.remove(
+                "file-selected"
+            );
+
+
+            uploadIcon.innerText = "↑";
+
+
+            uploadTitle.innerText =
+                "Upload your resume";
+
+
+            uploadText.innerText =
+                "PDF only · Maximum 5 MB";
+
+
+            selectedFile.innerText = "";
+
+        }
+
+
+        matcherForm.addEventListener(
+            "submit",
+            function () {
+
+                analyseButton.disabled = true;
+
+
+                buttonText.innerText =
+                    "Analysing resume...";
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

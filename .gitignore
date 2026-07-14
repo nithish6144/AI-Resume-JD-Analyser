@@ -1,0 +1,8 @@
+.env
+flask_session/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.vscode/
+.DS_Store
