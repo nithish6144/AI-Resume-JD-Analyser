@@ -32,10 +32,7 @@ app.config["MAX_CONTENT_LENGTH"] = (
 
 app.config["SESSION_TYPE"] = "filesystem"
 
-app.config["SESSION_FILE_DIR"] = os.path.join(
-    app.root_path,
-    "flask_session"
-)
+app.config["SESSION_FILE_DIR"] = "/tmp/flask_session"
 
 app.config["SESSION_PERMANENT"] = False
 
